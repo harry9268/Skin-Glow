@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Glow Beauty Center — Muy pronto</title>
+    <meta name="description" content="Skin Glow Beauty Center — Clínica de belleza y estética avanzada en Santa Cruz de Tenerife. Nuestra nueva web está en camino.">
+    <meta property="og:title" content="Skin Glow Beauty Center">
+    <meta property="og:description" content="Clínica de belleza y estética avanzada. Muy pronto, en línea.">
+    <meta property="og:url" content="https://www.skinglow.es">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0b0908;
+            --gold: #d9a441;
+            --gold-bright: #f4c869;
+            --gold-dim: rgba(217,164,65,0.12);
+            --gold-border: rgba(217,164,65,0.24);
+            --cream: #f3ecd8;
+            --muted: #7d715c;
+            --muted2: #4a4033;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--cream);
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 55% 45% at 80% 12%, rgba(217,164,65,0.14) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 55% at 10% 90%, rgba(169,112,15,0.12) 0%, transparent 55%);
+        }
+
+        .page {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 32px 52px;
+        }
+
+        .deco-line { position: fixed; pointer-events: none; z-index: 5; }
+        .deco-h { left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(217,164,65,0.16), transparent); }
+        .deco-h.t { top: 84px; }
+        .deco-h.b { bottom: 84px; }
+        .deco-v { top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, rgba(217,164,65,0.12), transparent); }
+        .deco-v.l { left: 52px; }
+        .deco-v.r { right: 52px; }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeDown 0.7s ease both;
+        }
+
+        .logo-text { display: flex; flex-direction: column; line-height: 1; }
+        .logo-main {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+        .logo-main em { color: var(--gold); font-style: italic; }
+        .logo-sub {
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: 0.38em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--gold-border);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+        }
+        .pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); animation: blink 1.8s ease infinite; }
+        @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.25;transform:scale(0.6)} }
+
+        /* ── CENTRO ── */
+        .center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 26px;
+            animation: fadeUp 0.7s 0.1s ease both;
+        }
+
+        .headline {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(40px, 6.2vw, 78px);
+            font-weight: 600;
+            line-height: 1.02;
+            letter-spacing: -0.01em;
+            margin-bottom: 20px;
+            animation: fadeUp 0.7s 0.15s ease both;
+        }
+        .headline .g {
+            font-style: italic;
+            background: linear-gradient(to right, var(--gold-bright) 10%, var(--gold) 60%, #a9700f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .headline .dim { font-weight: 400; font-style: italic; color: rgba(243,236,216,0.32); }
+
+        .subline {
+            font-size: clamp(12.5px, 1.3vw, 15px);
+            font-weight: 300;
+            color: rgba(243,236,216,0.55);
+            max-width: 440px;
+            line-height: 1.75;
+            margin-bottom: 38px;
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+
+        /* CTA */
+        .cta-row {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 44px;
+            animation: fadeUp 0.7s 0.22s ease both;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--gold), var(--gold-bright));
+            color: #150f06;
+            box-shadow: 0 0 24px rgba(217,164,65,0.28);
+        }
+        .btn-primary:hover { box-shadow: 0 0 32px rgba(217,164,65,0.48); transform: translateY(-1px); }
+        .btn-ghost {
+            border: 1px solid rgba(243,236,216,0.16);
+            color: var(--cream);
+        }
+        .btn-ghost:hover { border-color: var(--gold); background: var(--gold-dim); }
+
+        /* COUNTERS */
+        .counters {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 44px;
+            animation: fadeUp 0.7s 0.25s ease both;
+        }
+        .cnt { text-align: center; }
+        .cnt-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #fff;
+            line-height: 1;
+        }
+        .cnt-num em { color: var(--gold); font-style: normal; }
+        .cnt-lbl {
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .cnt-sep { width: 1px; height: 32px; background: rgba(243,236,216,0.08); }
+
+        /* PROGRESS */
+        .progress-wrap {
+            width: clamp(260px, 38vw, 440px);
+            margin-bottom: 38px;
+            animation: fadeUp 0.7s 0.3s ease both;
+        }
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 9px;
+        }
+        .progress-meta #pct { color: var(--gold); }
+        .progress-track {
+            width: 100%;
+            height: 2px;
+            background: rgba(243,236,216,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #a9700f, var(--gold), var(--gold-bright));
+            border-radius: 100px;
+            transition: width 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 10px rgba(217,164,65,0.55);
+        }
+
+        /* CONTACT ROW */
+        .contact-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            row-gap: 6px;
+            animation: fadeUp 0.7s 0.35s ease both;
+        }
+        .citem {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            border-right: 1px solid rgba(243,236,216,0.08);
+        }
+        .citem:last-child { border-right: none; }
+        .citem-label { font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted2); }
+        .citem a { font-size: 12px; font-weight: 500; color: var(--gold); text-decoration: none; transition: color 0.2s; }
+        .citem a:hover { color: #fff; }
+        .citem span.val { font-size: 12px; font-weight: 500; color: rgba(243,236,216,0.45); }
+
+        /* ── FOOTER ── */
+        footer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            animation: fadeDown 0.7s 0.4s ease both;
+        }
+
+        .loc { display: flex; flex-direction: column; gap: 3px; }
+        .loc-r { font-size: 8.5px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+        .loc-c { font-size: 11.5px; color: rgba(243,236,216,0.4); }
+
+        .footer-right { text-align: right; }
+        .footer-domain {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(243,236,216,0.28);
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        .footer-legal {
+            font-size: 8.5px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(243,236,216,0.14);
+            line-height: 1.9;
+        }
+
+        @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── MOBILE ── */
+        @media (max-width: 680px) {
+            html, body { overflow-y: auto; }
+            .page { padding: 22px; overflow-y: auto; height: auto; min-height: 100vh; }
+            .deco-v, .deco-h { display: none; }
+            footer { flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+            .footer-right { text-align: center; }
+            .counters { gap: 16px; }
+            .citem { padding: 0 10px; }
+            .cta-row { flex-direction: column; width: 100%; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="bg-glow"></div>
+<div class="deco-line deco-h t"></div>
+<div class="deco-line deco-h b"></div>
+<div class="deco-line deco-v l"></div>
+<div class="deco-line deco-v r"></div>
+
+<div class="page">
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-text">
+            <div class="logo-main">Skin <em>Glow</em></div>
+            <div class="logo-sub">Beauty Center</div>
+        </div>
+
+        <div class="status-badge">
+            <div class="pulse"></div>
+            <span>Renovando nuestra web · 2026</span>
+        </div>
+    </header>
+
+    <!-- CENTRO -->
+    <div class="center">
+
+        <div class="eyebrow">Clínica de Belleza y Estética Avanzada</div>
+
+        <h1 class="headline">
+            <span class="g">Volvemos</span><br>
+            <span class="dim">más radiantes que nunca</span>
+        </h1>
+
+        <p class="subline">
+            Estamos renovando nuestra web para ofrecerte una mejor experiencia:
+            reservas online, tratamientos y todo lo que hace especial a Skin Glow.
+            Mientras tanto, escríbenos y te atendemos encantados.
+        </p>
+
+        <div class="cta-row">
+            <a class="btn btn-primary" href="https://wa.me/628016415" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+            <a class="btn btn-ghost" href="tel:+34628016415">Llamar</a>
+        </div>
+
+        <!-- COUNTERS -->
+        <div class="counters">
+            <div class="cnt">
+                <div class="cnt-num"><span class="cnum" data-target="10">0</span><em>+</em></div>
+                <div class="cnt-lbl">Años exp.</div>
+            </div>
+            <div class="cnt-sep"></div>
+            <div class="cnt">
+                <div class="cnt-num"><span class="cnum" data-target="5000">0</span><em>+</em></div>
+                <div class="cnt-lbl">Clientes felices</div>
+            </div>
+            <div class="cnt-sep"></div>
+            <div class="cnt">
+                <div class="cnt-num"><span class="cnum" data-target="20">0</span><em>+</em></div>
+                <div class="cnt-lbl">Tratamientos</div>
+            </div>
+            <div class="cnt-sep"></div>
+            <div class="cnt">
+                <div class="cnt-num"><span class="cnum" data-target="100">0</span><em>%</em></div>
+                <div class="cnt-lbl">Cuidado personal</div>
+            </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="progress-wrap">
+            <div class="progress-meta">
+                <span>Desarrollo Web</span>
+                <span id="pct">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="pbar"></div>
+            </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="contact-row">
+            <div class="citem">
+                <span class="citem-label">Email</span>
+                <a href="mailto:desi_alki@yahoo.es">desi_alki@yahoo.es</a>
+            </div>
+            <div class="citem">
+                <span class="citem-label">Tel</span>
+                <a href="tel:+34628016415">+34 628016415</a>
+            </div>
+            <div class="citem">
+                <span class="citem-label">Web</span>
+                <span class="val">skinglow.es</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="loc">
+            <span class="loc-r">Clínica</span>
+            <span class="loc-c">Av. La Salle, 7 · 38005 Santa Cruz de Tenerife</span>
+        </div>
+
+        <div class="footer-right">
+            <div class="footer-domain">www.skinglow.es</div>
+            <div class="footer-legal">
+                Lunes a sábado · 9:00 a 21:00<br>
+                © 2026 Skin Glow Beauty Center
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+// ── PARTÍCULAS ──
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, nodes = [];
+
+function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Node {
+    constructor() { this.reset(true); }
+    reset(init) {
+        this.x  = Math.random() * W;
+        this.y  = init ? Math.random() * H : (Math.random() > 0.5 ? -5 : H + 5);
+        this.vx = (Math.random() - 0.5) * 0.24;
+        this.vy = (Math.random() - 0.5) * 0.24;
+        this.r  = Math.random() * 1.4 + 0.4;
+        this.a  = Math.random() * 0.5 + 0.1;
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < -10 || this.x > W + 10 || this.y < -10 || this.y > H + 10) this.reset(false);
+    }
+}
+
+const COUNT = Math.min(55, Math.floor(window.innerWidth * window.innerHeight / 22000));
+for (let i = 0; i < COUNT; i++) nodes.push(new Node());
+
+function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const d  = Math.sqrt(dx*dx + dy*dy);
+            if (d < 130) {
+                ctx.beginPath();
+                ctx.moveTo(nodes[i].x, nodes[i].y);
+                ctx.lineTo(nodes[j].x, nodes[j].y);
+                ctx.strokeStyle = `rgba(217,164,65,${(1 - d/130) * 0.18})`;
+                ctx.lineWidth = 0.7;
+                ctx.stroke();
+            }
+        }
+    }
+    nodes.forEach(n => {
+        n.update();
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(217,164,65,${n.a})`;
+        ctx.fill();
+    });
+    requestAnimationFrame(draw);
+}
+draw();
+
+// ── PROGRESO ──
+// Cambia este número (0-100) según el % real de avance del proyecto:
+const PROGRESS = 20;
+
+setTimeout(() => {
+    document.getElementById('pbar').style.width = PROGRESS + '%';
+    let cur = 0;
+    const tick = () => {
+        if (cur < PROGRESS) { cur++; document.getElementById('pct').textContent = cur + '%'; requestAnimationFrame(tick); }
+    };
+    tick();
+}, 500);
+
+// ── CONTADORES ──
+function animCounters() {
+    document.querySelectorAll('.cnum').forEach(el => {
+        const target = +el.dataset.target;
+        const dur = 1600 + target * 1.4;
+        const start = performance.now();
+        const run = now => {
+            const p = Math.min((now - start) / dur, 1);
+            el.textContent = Math.round((1 - Math.pow(1-p, 3)) * target);
+            if (p < 1) requestAnimationFrame(run);
+        };
+        requestAnimationFrame(run);
+    });
+}
+setTimeout(animCounters, 350);
+</script>
+</body>
+</html>
